@@ -22,6 +22,8 @@ let selectedSeat = '';
 let selectedLounge = '';
 let tempPayData = null;
 let loyaltyPoints = Number.parseInt(localStorage.getItem('lovely_points') || '0',10) || 0;
+// CSV export stays locked until the admin login succeeds.
+let adminAuthenticated = false;
 
 function readBookings(){
   try { const value = JSON.parse(localStorage.getItem(CSV_KEY) || '[]'); return Array.isArray(value) ? value : []; }
@@ -196,6 +198,11 @@ function getCSVString(){
   return CSV_HEADER + (rows.length ? `\r\n${rows.join('\r\n')}` : '');
 }
 function downloadCSV(){
+  const adminPanel = document.getElementById('adminPanel');
+  if(!adminAuthenticated || !adminPanel || adminPanel.style.display !== 'block'){
+    alert('Please log in to the Admin Portal to download booking data.');
+    return;
+  }
   const rows = readBookings();
   if(!rows.length){ alert('No booking records found. Generate a lounge pass first.'); return; }
   const blob = new Blob([getCSVString()],{type:'text/csv;charset=utf-8'});
@@ -220,7 +227,7 @@ function verifyPass(){
 
 function toggleAdmin(){
   const panel = document.getElementById('adminPanel');
-  if(panel.style.display === 'block'){ panel.style.display='none'; return; }
+  if(panel.style.display === 'block'){ panel.style.display='none'; adminAuthenticated=false; return; }
   const modal = document.getElementById('adminLoginModal');
   modal.style.display='flex'; modal.setAttribute('aria-hidden','false');
   document.getElementById('adminPassword').focus();
@@ -235,6 +242,7 @@ function adminLogin(event){
   }
   document.getElementById('adminLoginError').textContent='';
   document.getElementById('adminPassword').value=''; closeAdminLogin();
+  adminAuthenticated=true;
   const panel=document.getElementById('adminPanel'); panel.style.display='block';
   updateAdmin(); panel.scrollIntoView({behavior:'smooth',block:'start'});
 }

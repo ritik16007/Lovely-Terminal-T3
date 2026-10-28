@@ -28,7 +28,7 @@
 <section class="hero"><div class="hero-plane" aria-hidden="true"></div><h1 id="heroTitle">Lovely Terminal <span class="grad">T3 Guide</span></h1><p id="heroSub">Official Flight Departure Guide &amp; Premium Lounge Pass System</p></section>
 
 <section id="adminPanel" class="board-section glass-card" style="display:none">
-  <h2>📊 Admin Dashboard - Lovely Terminal Analytics</h2>
+  <div class="admin-dashboard-header"><h2>📊 Admin Dashboard - Lovely Terminal Analytics</h2><button type="button" class="btn btn-ghost csv-button" onclick="downloadCSV()">📥 Download Bookings CSV</button></div>
   <div class="admin-stats">
     <div class="glass-card stat-card"><h3 id="totalBookings">0</h3><p>Total Bookings</p></div>
     <div class="glass-card stat-card"><h3 id="totalRevenue">₹0</h3><p>Revenue</p></div>
@@ -63,7 +63,7 @@
       <select id="pLoungeType" onchange="handleLoungeChange(this.value)" aria-label="Lounge type"><option value="">Select Lounge First</option><option>Economy</option><option>Business</option><option>First Class</option></select>
       <button type="button" class="btn btn-primary full" onclick="openPayment()">💳 Pay &amp; Generate Lovely Pass</button>
     </div></div>
-    <div class="record-tools"><input id="verifyInput" placeholder="Enter Pass ID"><button type="button" class="btn btn-ghost" onclick="verifyPass()">Verify</button><button type="button" class="btn btn-ghost csv-button" onclick="downloadCSV()">📥 CSV</button></div>
+    <div class="record-tools"><input id="verifyInput" placeholder="Enter Pass ID"><button type="button" class="btn btn-ghost" onclick="verifyPass()">Verify</button></div>
     <div id="verifyResult" aria-live="polite"></div><span id="csvCount" class="csv-count"></span>
   </div>
 

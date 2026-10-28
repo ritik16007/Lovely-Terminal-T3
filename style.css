@@ -95,6 +95,7 @@ td{padding:14px;font-size:14px;border-bottom:1px solid rgba(255,255,255,0.06)}
 .header-tools{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 .loyalty-badge{background:rgba(255,204,0,.15);color:var(--yellow)}
 .admin-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin:16px 0}
+.admin-dashboard-header{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:12px}
 .stat-card{text-align:center}
 .booking-panel{min-width:0}
 .seat-button{margin-top:8px;width:100%}
