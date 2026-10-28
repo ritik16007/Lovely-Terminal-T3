@@ -24,6 +24,30 @@ let tempPayData = null;
 let loyaltyPoints = Number.parseInt(localStorage.getItem('lovely_points') || '0',10) || 0;
 // CSV export stays locked until the admin login succeeds.
 let adminAuthenticated = false;
+let deferredInstallPrompt = null;
+
+async function installApp(){
+  if(deferredInstallPrompt){
+    await deferredInstallPrompt.prompt();
+    const choice = await deferredInstallPrompt.userChoice;
+    deferredInstallPrompt = null;
+    if(choice.outcome === 'accepted') document.getElementById('installAppBtn').textContent = '✅ App Installed';
+    return;
+  }
+  const isInstalled = window.matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+  if(isInstalled){ alert('Lovely Terminal T3 is already installed on this device.'); return; }
+  alert('To add Lovely Terminal T3 to your phone:\n\nAndroid: open the browser menu (⋮) and choose Install app or Add to Home screen.\niPhone: open this page in Safari, tap Share, then Add to Home Screen.');
+}
+
+window.addEventListener('beforeinstallprompt',event=>{
+  event.preventDefault();
+  deferredInstallPrompt=event;
+});
+window.addEventListener('appinstalled',()=>{
+  const button=document.getElementById('installAppBtn');
+  if(button){button.textContent='✅ App Installed';button.disabled=true;}
+  deferredInstallPrompt=null;
+});
 
 function readBookings(){
   try { const value = JSON.parse(localStorage.getItem(CSV_KEY) || '[]'); return Array.isArray(value) ? value : []; }
@@ -287,6 +311,9 @@ function tick(){
 }
 window.addEventListener('DOMContentLoaded',()=>{
   tick(); window.setInterval(tick,1000); renderFlights(); updateCSVCount(); renderLost();
+  if('serviceWorker' in navigator && location.protocol !== 'file:'){
+    navigator.serviceWorker.register('./service-worker.js').catch(error=>console.warn('Offline app setup failed',error));
+  }
   document.querySelectorAll('.lounge').forEach((card,index)=>card.dataset.lounge=['Economy','Business','First Class'][index]);
   document.querySelectorAll('.modal').forEach(modal=>modal.addEventListener('click',event=>{if(event.target===modal){modal.style.display='none';modal.setAttribute('aria-hidden','true');}}));
 });

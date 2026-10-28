@@ -135,7 +135,50 @@ td{padding:14px;font-size:14px;border-bottom:1px solid rgba(255,255,255,0.06)}
 .verify-valid{color:#4ade80}.verify-invalid{color:#f87171}
 .seat-notice{min-height:16px;margin-top:-6px;color:#4ade80;font-size:12px}
 .pass-row span:last-child{font-weight:600;text-align:right;overflow-wrap:anywhere;margin-left:12px}
+.btn-install{background:rgba(250,204,21,.14);color:#facc15;border:1px solid rgba(250,204,21,.35)}
+.btn-install:hover{background:rgba(250,204,21,.24)}
+button,input,select{touch-action:manipulation}
+input,select{font-size:16px}
+img,canvas{max-width:100%}
 @media(max-width:620px){.header-tools{justify-content:flex-start}.live-box{font-size:10px}.pass-watermark{font-size:18px}.pass-watermark svg{width:56px;height:56px}}
+@media(max-width:620px){
+  header{padding:12px 4%;align-items:flex-start}
+  .logo{font-size:19px}
+  .header-tools{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));width:100%;gap:7px}
+  .header-tools .live-box{min-width:0;padding:8px 10px;text-align:center;white-space:normal;line-height:1.35}
+  #weatherBox,#liveBox{grid-column:1/-1}
+  .header-tools .btn,.header-tools select{width:100%;min-height:42px}
+  .hero{height:260px;padding:20px 16px}
+  .hero-plane{width:240px;height:105px;top:25%}
+  .hero p{max-width:32ch;font-size:14px}
+  .board-section{padding:14px 4%;margin-top:8px}
+  .board-header h2{font-size:21px}
+  .search-box{width:100%;display:grid;grid-template-columns:1fr;gap:8px}
+  .search-box input,.search-box select{width:100%;min-width:0;min-height:44px}
+  .lounge-section{grid-template-columns:1fr;padding:12px 4% 40px;gap:12px}
+  .lounge-cards{grid-template-columns:1fr}
+  .lounge{padding:16px}
+  .form-grid{grid-template-columns:1fr;gap:10px}
+  .form-grid .full,.btn.full{grid-column:1/-1}
+  .record-tools{display:grid;grid-template-columns:1fr 1fr}
+  .record-tools input{grid-column:1/-1;width:100%;min-width:0;min-height:44px}
+  .record-tools .btn{min-height:44px}
+  .admin-dashboard-header h2{font-size:20px}
+  .admin-dashboard-header .btn{width:100%;min-height:44px}
+  .pass-top{gap:8px;align-items:flex-start;flex-wrap:wrap}
+  .pass-top b{overflow-wrap:anywhere}
+  .pass-row{gap:8px}
+  .pass-row span:last-child{max-width:62%}
+  .qr-box{flex-wrap:wrap}
+  .modal{padding:12px}
+  .modal-content{padding:16px}
+  .footer{padding:18px 4%}
+}
+@media(max-width:380px){
+  .logo{font-size:17px}
+  .header-tools{grid-template-columns:1fr 1fr}
+  .lounge-section{padding-left:3%;padding-right:3%}
+}
 @media print{
   @page{size:auto;margin:12mm}
   body{background:white!important}

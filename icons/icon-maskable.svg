@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <rect width="512" height="512" fill="#0f172a"/>
+  <circle cx="256" cy="226" r="148" fill="#111c2e" stroke="#263b53" stroke-width="8"/>
+  <path d="M126 254 239 220 319 124q9-11 25-10l18 3q9 2 4 12l-61 100 87 44q11 6 9 18l-2 14q-1 9-12 5l-104-33-62 93q-7 10-17 7l-14-4q-8-3-4-12l31-99-88 7q-12 1-15-10l-4-12q-3-9 15-12z" fill="#22d3ee" stroke="#e0faff" stroke-width="7" stroke-linejoin="round"/>
+  <text x="256" y="434" fill="#f8fafc" font-family="Segoe UI,Arial,sans-serif" font-size="44" font-weight="700" text-anchor="middle" letter-spacing="5">T3</text>
+</svg>

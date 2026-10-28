@@ -3,10 +3,15 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0f172a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Lovely T3">
 <title>Lovely Terminal - T3 | All-in-One Airport System</title>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 <link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="./icons/icon-180.png">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" defer></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
 <script src="script.js" defer></script>
@@ -19,6 +24,7 @@
     <div id="loyaltyBadge" class="live-box loyalty-badge">⭐ 0 Points</div>
     <div class="live-box" id="weatherBox">⛅ Loading weather...</div>
     <div class="live-box" id="liveBox">Loading...</div>
+    <button class="btn btn-install" id="installAppBtn" type="button" onclick="installApp()">📲 Install App</button>
     <button class="btn btn-ghost" onclick="toggleTheme()" id="themeBtn" aria-label="Toggle theme">🌙</button>
     <select id="langSelect" onchange="changeLang()" class="btn btn-ghost" aria-label="Language"><option value="en">EN</option><option value="hi">हिंदी</option></select>
     <button class="btn btn-ghost" onclick="toggleAdmin()">📊 Admin</button>
