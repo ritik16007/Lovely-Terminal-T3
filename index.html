@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lovely Terminal - T3 | All-in-One Airport System</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<link rel="manifest" href="manifest.json">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
+<script src="script.js" defer></script>
+</head>
+<body>
+<div class="clouds" aria-hidden="true"><div class="cloud"></div><div class="cloud"></div><div class="cloud"></div></div>
+<header>
+  <div class="logo">LOVELY <span>TERMINAL - T3</span></div>
+  <div class="header-tools">
+    <div id="loyaltyBadge" class="live-box loyalty-badge">⭐ 0 Points</div>
+    <div class="live-box" id="weatherBox">⛅ Loading weather...</div>
+    <div class="live-box" id="liveBox">Loading...</div>
+    <button class="btn btn-ghost" onclick="toggleTheme()" id="themeBtn" aria-label="Toggle theme">🌙</button>
+    <select id="langSelect" onchange="changeLang()" class="btn btn-ghost" aria-label="Language"><option value="en">EN</option><option value="hi">हिंदी</option></select>
+    <button class="btn btn-ghost" onclick="toggleAdmin()">📊 Admin</button>
+  </div>
+</header>
+<div class="ticker"><div class="ticker-content" id="ticker">🔊 Welcome to Lovely Terminal T3 • AI-202 is now boarding at Gate A12 • Weather in Delhi: 22°C Clear • LPU Loves Lovely Terminal • </div></div>
+<section class="hero"><div class="hero-plane" aria-hidden="true"></div><h1 id="heroTitle">Lovely Terminal <span class="grad">T3 Guide</span></h1><p id="heroSub">Official Flight Departure Guide &amp; Premium Lounge Pass System</p></section>
+
+<section id="adminPanel" class="board-section glass-card" style="display:none">
+  <h2>📊 Admin Dashboard - Lovely Terminal Analytics</h2>
+  <div class="admin-stats">
+    <div class="glass-card stat-card"><h3 id="totalBookings">0</h3><p>Total Bookings</p></div>
+    <div class="glass-card stat-card"><h3 id="totalRevenue">₹0</h3><p>Revenue</p></div>
+    <div class="glass-card stat-card"><h3 id="popularLounge">-</h3><p>Popular Lounge</p></div>
+    <div class="glass-card stat-card"><h3 id="totalPoints">0</h3><p>Loyalty Points Given</p></div>
+  </div>
+  <canvas id="revenueChart" height="100"></canvas>
+</section>
+
+<section class="board-section glass-card">
+  <div class="board-header"><h2>🛫 Departure Board</h2><div class="search-box"><input id="searchFlight" placeholder="Search flight / city..." oninput="renderFlights()"><select id="filterStatus" onchange="renderFlights()"><option value="all">All Status</option><option value="On Time">On Time</option><option value="Boarding">Boarding</option><option value="Delayed">Delayed</option></select></div></div>
+  <div class="table-wrap"><table><thead><tr><th>FLIGHT</th><th>DESTINATION</th><th>GATE</th><th>TIME</th><th>STATUS</th><th>ACTION</th></tr></thead><tbody id="flightBody"></tbody></table></div>
+</section>
+
+<section class="lounge-section">
+  <div class="glass-card booking-panel">
+    <h2 id="loungeTitle">💎 Lovely Lounge Selection</h2>
+    <div class="lounge-cards">
+  <div class="lounge glass-card" onclick="selectLounge('Economy',999,this)"><h3>Economy Lounge</h3><div class="price">₹999 / 3 hrs</div><div class="perk">✓ WiFi + Snacks</div><button type="button" class="btn btn-ghost seat-button" onclick="openSeatMap(event,'Economy',999,this)">🎲 Auto-Assign Seat</button></div>
+  <div class="lounge glass-card" onclick="selectLounge('Business',1999,this)"><h3>Business Lounge</h3><div class="price">₹1999 / 5 hrs</div><div class="perk">✓ Buffet + Shower</div><button type="button" class="btn btn-ghost seat-button" onclick="openSeatMap(event,'Business',1999,this)">🎲 Auto-Assign Seat</button></div>
+  <div class="lounge glass-card" onclick="selectLounge('First Class',3499,this)"><h3>First Class Suite</h3><div class="price">₹3499 / 8 hrs</div><div class="perk">✓ Private Cabin + Spa</div><button type="button" class="btn btn-ghost seat-button" onclick="openSeatMap(event,'First Class',3499,this)">🎲 Auto-Assign Seat</button></div>
+    </div>
+    <div class="glass-card food-panel"><h3>🍔 Pre-Order Food (Lounge)</h3><div class="food-options"><label><input type="checkbox" value="Coffee-199" class="food"> Coffee ₹199</label><label><input type="checkbox" value="Burger-299" class="food"> Burger ₹299</label><label><input type="checkbox" value="Meal-499" class="food"> Full Meal ₹499</label></div></div>
+    <div class="passenger-panel"><h3>Passenger Details</h3><div class="form-grid">
+      <input id="pName" placeholder="Full Name" class="full" autocomplete="name">
+      <input id="pFlight" placeholder="Flight No - ex: AI-202">
+      <input id="pPhone" placeholder="Phone Number" autocomplete="tel">
+      <!-- Readonly seat field is filled by the random seat assignment. -->
+      <input id="pSeat" placeholder="Seat will be assigned automatically" readonly aria-label="Randomly assigned lounge seat">
+      <small id="seatNotice" class="seat-notice full" role="status" aria-live="polite"></small>
+      <select id="pHours" aria-label="Lounge hours"><option value="3">3 Hours</option><option value="5">5 Hours</option><option value="8">8 Hours</option></select>
+      <select id="pLoungeType" onchange="handleLoungeChange(this.value)" aria-label="Lounge type"><option value="">Select Lounge First</option><option>Economy</option><option>Business</option><option>First Class</option></select>
+      <button type="button" class="btn btn-primary full" onclick="openPayment()">💳 Pay &amp; Generate Lovely Pass</button>
+    </div></div>
+    <div class="record-tools"><input id="verifyInput" placeholder="Enter Pass ID"><button type="button" class="btn btn-ghost" onclick="verifyPass()">Verify</button><button type="button" class="btn btn-ghost csv-button" onclick="downloadCSV()">📥 CSV</button></div>
+    <div id="verifyResult" aria-live="polite"></div><span id="csvCount" class="csv-count"></span>
+  </div>
+
+  <aside>
+    <!-- Fixed: this is the only element with id=passCard. The watermark is a small inline brand mark. -->
+    <div id="passCard" class="pass-card" style="display:none">
+      <div class="pass-watermark" aria-hidden="true"><svg viewBox="0 0 64 64" role="img"><circle cx="32" cy="32" r="29"/><path d="M10 35l19-5 13-17 6 1-7 18 13 8-1 4-16-4-10 10-4-1 5-12-17 2z"/></svg><span>LOVELY<br>TERMINAL T3</span></div>
+      <div class="pass-content">
+        <div class="pass-top"><b id="passId">LOVELY-T3-0000</b><span>LOVELY TERMINAL T3</span></div>
+        <div class="pass-row"><span>Passenger</span><span id="rName">-</span></div><div class="pass-row"><span>Flight</span><span id="rFlight">-</span></div><div class="pass-row"><span>Lounge</span><span id="rLounge">-</span></div><div class="pass-row"><span>Seat</span><span id="rSeat">-</span></div><div class="pass-row"><span>Food</span><span id="rFood">-</span></div><div class="pass-row"><span>Valid For</span><span id="rHours">-</span></div><div class="pass-row"><span>Amount</span><span id="rPrice">-</span></div><div class="pass-row"><span>Points Earned</span><span id="rPoints" class="points-earned">-</span></div>
+        <div class="qr-box"><div id="qrcode" aria-label="Pass QR code"></div><div><b id="rTime"></b><br>Show at Gate</div></div>
+        <button type="button" class="btn btn-primary full print-button" onclick="window.print()">🖨️ Print Pass</button>
+      </div>
+    </div>
+    <div id="noPass" class="glass-card no-pass">No pass yet. Flight → Lounge → Seat → Pay</div>
+    <div class="glass-card lost-panel"><h3>🧳 Lost &amp; Found - Lovely Terminal</h3><div class="form-grid lost-form"><input id="lostItem" placeholder="Item - ex: Black Wallet" class="full"><button type="button" class="btn btn-ghost full" onclick="addLost()">Report Lost</button></div><ul id="lostList" class="lost-list"></ul></div>
+  </aside>
+</section>
+
+<footer class="footer">Lovely Terminal T3 · Passenger lounge services · <a href="mailto:lovelyterminalt3@gmail.com">lovelyterminalt3@gmail.com</a></footer>
+
+<!-- Fixed: modals are opened with inline display:flex and closed with display:none. -->
+<div id="seatModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="seatModalTitle" style="display:none"><div class="modal-content glass-card"><h3 id="seatModalTitle">🪑 Choose Your Lounge Seat</h3><p class="seat-legend">Available seats are blue · Occupied seats are unavailable</p><div id="seatGrid" class="seat-grid"></div><button type="button" class="btn btn-primary" onclick="closeSeatMap()" style="margin-top:12px;width:100%">Confirm Seat</button></div></div>
+<div id="payModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="payModalTitle" style="display:none"><div class="modal-content glass-card"><h3 id="payModalTitle">💳 Lovely Terminal Payment</h3><p id="payAmount" class="pay-amount"></p><div class="form-grid"><input aria-label="UPI ID" placeholder="UPI ID - test@upi" value="student@upi"><input aria-label="Card number" placeholder="Card - 4111 1111 1111 1111" value="4111 1111 1111 1111"><input aria-label="CVV" placeholder="CVV" value="123"><input aria-label="OTP" placeholder="OTP" value="123456"></div><button type="button" class="btn btn-primary full pay-now" onclick="confirmPayment()">✅ Pay Now (Mock)</button><button type="button" class="btn btn-ghost full" onclick="closePayment()" style="margin-top:8px">Cancel</button></div></div>
+<div id="adminLoginModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="adminLoginTitle" style="display:none"><form class="modal-content glass-card" onsubmit="adminLogin(event)"><h3 id="adminLoginTitle">🔐 Admin Login</h3><p class="admin-hint">Enter the admin password to view terminal analytics.</p><input id="adminPassword" type="password" placeholder="Admin password" autocomplete="current-password"><p id="adminLoginError" class="admin-error" aria-live="polite"></p><button class="btn btn-primary full" type="submit">Sign in</button><button type="button" class="btn btn-ghost full" onclick="closeAdminLogin()" style="margin-top:8px">Cancel</button></form></div>
+</body>
+</html>
