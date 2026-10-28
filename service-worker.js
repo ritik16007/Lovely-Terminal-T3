@@ -1,4 +1,5 @@
-const CACHE_NAME = 'lovely-terminal-t3-v1';
+// Bump this version so installed copies fetch the new cloud-sync UI and scripts.
+const CACHE_NAME = 'lovely-terminal-t3-v2';
 const CORE_FILES = [
   './index.html',
   './style.css',

@@ -14,6 +14,8 @@
 <link rel="apple-touch-icon" href="./icons/icon-180.png">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" defer></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
+<!-- Public Supabase client key is safe in the browser only with the per-user RLS policies in supabase/schema.sql. -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
 <script src="script.js" defer></script>
 </head>
 <body>
@@ -25,6 +27,7 @@
     <div class="live-box" id="weatherBox">⛅ Loading weather...</div>
     <div class="live-box" id="liveBox">Loading...</div>
     <button class="btn btn-install" id="installAppBtn" type="button" onclick="installApp()">📲 Install App</button>
+    <button class="btn btn-ghost" id="syncAccountBtn" type="button" onclick="openSyncModal()">☁️ Sign in to sync</button>
     <button class="btn btn-ghost" onclick="toggleTheme()" id="themeBtn" aria-label="Toggle theme">🌙</button>
     <select id="langSelect" onchange="changeLang()" class="btn btn-ghost" aria-label="Language"><option value="en">EN</option><option value="hi">हिंदी</option></select>
     <button class="btn btn-ghost" onclick="toggleAdmin()">📊 Admin</button>
@@ -95,5 +98,6 @@
 <div id="seatModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="seatModalTitle" style="display:none"><div class="modal-content glass-card"><h3 id="seatModalTitle">🪑 Choose Your Lounge Seat</h3><p class="seat-legend">Available seats are blue · Occupied seats are unavailable</p><div id="seatGrid" class="seat-grid"></div><button type="button" class="btn btn-primary" onclick="closeSeatMap()" style="margin-top:12px;width:100%">Confirm Seat</button></div></div>
 <div id="payModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="payModalTitle" style="display:none"><div class="modal-content glass-card"><h3 id="payModalTitle">💳 Lovely Terminal Payment</h3><p id="payAmount" class="pay-amount"></p><div class="form-grid"><input aria-label="UPI ID" placeholder="UPI ID - test@upi" value="student@upi"><input aria-label="Card number" placeholder="Card - 4111 1111 1111 1111" value="4111 1111 1111 1111"><input aria-label="CVV" placeholder="CVV" value="123"><input aria-label="OTP" placeholder="OTP" value="123456"></div><button type="button" class="btn btn-primary full pay-now" onclick="confirmPayment()">✅ Pay Now (Mock)</button><button type="button" class="btn btn-ghost full" onclick="closePayment()" style="margin-top:8px">Cancel</button></div></div>
 <div id="adminLoginModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="adminLoginTitle" style="display:none"><form class="modal-content glass-card" onsubmit="adminLogin(event)"><h3 id="adminLoginTitle">🔐 Admin Login</h3><p class="admin-hint">Enter the admin password to view terminal analytics.</p><input id="adminPassword" type="password" placeholder="Admin password" autocomplete="current-password"><p id="adminLoginError" class="admin-error" aria-live="polite"></p><button class="btn btn-primary full" type="submit">Sign in</button><button type="button" class="btn btn-ghost full" onclick="closeAdminLogin()" style="margin-top:8px">Cancel</button></form></div>
+<div id="syncModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="syncTitle" style="display:none"><form class="modal-content glass-card" onsubmit="requestSyncLink(event)"><h3 id="syncTitle">☁️ Sync your bookings</h3><p>Use the same email on your laptop and phone. We’ll send a one-time sign-in link.</p><input id="syncEmail" type="email" placeholder="Your email address" autocomplete="email" required><p id="syncMessage" class="admin-hint" aria-live="polite"></p><button id="syncSubmit" class="btn btn-primary full" type="submit">Send sign-in link</button><button type="button" class="btn btn-ghost full" onclick="closeSyncModal()" style="margin-top:8px">Close</button></form></div>
 </body>
 </html>

@@ -25,6 +25,74 @@ let loyaltyPoints = Number.parseInt(localStorage.getItem('lovely_points') || '0'
 // CSV export stays locked until the admin login succeeds.
 let adminAuthenticated = false;
 let deferredInstallPrompt = null;
+// Fixed: bookings sync through the user's authenticated Supabase account; only the publishable key belongs in browser code.
+const SUPABASE_URL = 'https://ijlcjghdlrurdiaplqft.supabase.co';
+const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_c4jkxrjksfdd94Z8qUs1Yw_Wf8pSRmz';
+let syncClient = null;
+let syncUser = null;
+
+function setSyncStatus(message){
+  const status = document.getElementById('syncMessage');
+  if(status) status.textContent = message;
+}
+function updateSyncButton(){
+  const button = document.getElementById('syncAccountBtn');
+  if(button) button.textContent = syncUser ? `☁️ Synced: ${syncUser.email}` : '☁️ Sign in to sync';
+}
+function openSyncModal(){
+  const modal = document.getElementById('syncModal');
+  if(modal){ modal.style.display='flex'; modal.setAttribute('aria-hidden','false'); }
+  const email = document.getElementById('syncEmail');
+  if(email && syncUser) email.value = syncUser.email || '';
+  setSyncStatus(syncUser ? 'You are signed in. Use this same email on your other device.' : 'Enter your email and we’ll send a one-time sign-in link.');
+}
+function closeSyncModal(){
+  const modal = document.getElementById('syncModal');
+  if(modal){ modal.style.display='none'; modal.setAttribute('aria-hidden','true'); }
+}
+async function requestSyncLink(event){
+  event.preventDefault();
+  if(!syncClient){ setSyncStatus('Cloud sync is not ready. Refresh the page and try again.'); return; }
+  const email = document.getElementById('syncEmail').value.trim();
+  const button = document.getElementById('syncSubmit');
+  if(button) button.disabled = true;
+  setSyncStatus('Sending sign-in link…');
+  const {error} = await syncClient.auth.signInWithOtp({email, options:{emailRedirectTo:location.href.split('#')[0]}});
+  if(button) button.disabled = false;
+  setSyncStatus(error ? `Could not send link: ${error.message}` : `Sign-in link sent to ${email}. Open it on this device, then sign in with the same email on your other device.`);
+}
+async function loadCloudBookings(){
+  if(!syncClient || !syncUser) return;
+  const {data,error} = await syncClient.from('lounge_bookings').select('pass_id,booking').eq('user_id',syncUser.id);
+  if(error){ console.warn('Cloud booking load failed:',error.message); setSyncStatus(`Cloud connection needs setup: ${error.message}`); return; }
+  const merged = new Map(readBookings().map(item=>[item.passId,item]));
+  (data || []).forEach(row=>{ if(row.booking?.passId) merged.set(row.pass_id,row.booking); });
+  const all = [...merged.values()];
+  localStorage.setItem(CSV_KEY,JSON.stringify(all));
+  loyaltyPoints = all.reduce((total,item)=>total+(Number(item.points)||0),0);
+  localStorage.setItem('lovely_points',String(loyaltyPoints));
+  const cloudIds = new Set((data || []).map(row=>row.pass_id));
+  const localOnly = all.filter(item=>item.passId && !cloudIds.has(item.passId));
+  if(localOnly.length){
+    const rows = localOnly.map(booking=>({user_id:syncUser.id,pass_id:booking.passId,booking}));
+    const saved = await syncClient.from('lounge_bookings').upsert(rows,{onConflict:'user_id,pass_id'});
+    if(saved.error) console.warn('Existing device bookings could not be uploaded:',saved.error.message);
+  }
+  all.forEach(item=>{ if(item.passId) localStorage.setItem(item.passId,JSON.stringify(item)); });
+  updateCSVCount(); updateAdmin();
+  setSyncStatus(`${all.length} booking(s) synced to this account.`);
+}
+async function initializeCloudSync(){
+  if(!window.supabase?.createClient){ setSyncStatus('Could not load the cloud sync library. Check your internet connection.'); return; }
+  syncClient = window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY);
+  const {data:{session}} = await syncClient.auth.getSession();
+  syncUser = session?.user || null; updateSyncButton();
+  if(syncUser) await loadCloudBookings();
+  syncClient.auth.onAuthStateChange((_event,nextSession)=>{
+    syncUser = nextSession?.user || null; updateSyncButton();
+    if(syncUser) setTimeout(()=>loadCloudBookings(),0);
+  });
+}
 
 async function installApp(){
   if(deferredInstallPrompt){
@@ -216,6 +284,11 @@ function saveToCSVStorage(data){
   bookings.push(data);
   localStorage.setItem(CSV_KEY,JSON.stringify(bookings));
   updateCSVCount(); updateAdmin();
+  // Fixed: keep local-first behavior, then sync this pass to the signed-in account in the cloud.
+  if(syncClient && syncUser) syncClient.from('lounge_bookings').upsert({user_id:syncUser.id,pass_id:data.passId,booking:data},{onConflict:'user_id,pass_id'}).then(({error})=>{
+    if(error){ console.warn('Booking cloud sync failed:',error.message); setSyncStatus(`Booking saved on this device; cloud sync failed: ${error.message}`); }
+    else setSyncStatus('Booking saved and synced to your account.');
+  });
 }
 function getCSVString(){
   const rows = readBookings().map(b => [b.passId,b.name,b.flight,b.phone,b.lounge,b.seat,b.food ?? b.foods,b.hrs ?? b.hours,b.price,b.points,b.created].map(csvCell).join(','));
@@ -311,6 +384,7 @@ function tick(){
 }
 window.addEventListener('DOMContentLoaded',()=>{
   tick(); window.setInterval(tick,1000); renderFlights(); updateCSVCount(); renderLost();
+  initializeCloudSync().catch(error=>{console.error('Cloud sync initialization failed:',error);setSyncStatus('Cloud sync could not start. Refresh and try again.');});
   if('serviceWorker' in navigator && location.protocol !== 'file:'){
     navigator.serviceWorker.register('./service-worker.js').catch(error=>console.warn('Offline app setup failed',error));
   }
